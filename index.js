@@ -1,3 +1,12 @@
+#!/usr/bin/env node
+
+const program = require('commander');
+
+program
+  .version('0.0.1')
+  .option('-p, --posts <required>','number of top posts to print')
+  .parse(process.argv);
+
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 
@@ -11,7 +20,8 @@ const options = {
 rp(options)
   .then(($) => {
     $('td.title .storylink').map(function(i, el) {
-        console.log(i + ": " + $(this).text());
+        if (i < program.posts)
+            console.log(i + ": " + $(this).text());
       });
   })
   .catch((err) => {
