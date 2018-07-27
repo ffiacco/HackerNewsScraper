@@ -10,11 +10,12 @@ program
   .parse(process.argv);
 
 const pages = Math.ceil(program.posts/30);
+let promiseChain = [];
+let result = {
+    articles: []
+}
 
-let scrape = new Promise((resolve, reject) => {
-    let result = {
-        articles: []
-    }
+let scrape = (resolve, reject) => {
     for (let i = 1; i <= pages; i++){
         let options = {
             uri: `https://news.ycombinator.com/news?p=` + i,
@@ -22,27 +23,34 @@ let scrape = new Promise((resolve, reject) => {
                 return cheerio.load(body);
             }
         };
-    
-        rp(options)
-        .then(($) => {
-            $('td.title .storylink').map(function(num, el) {
-                if (((i-1) * 30) + num < program.posts){
-                    result.articles.push({
-                        title: $(this).text()
-                    });
-                }
-                if (((i-1) * 30) + num < program.posts){
-                    resolve(result);
-                }
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-            reject("Couldn't scrape!");
-        });
-    }
-});
 
-scrape.then((result) => {
+        let p = new Promise((resolve, reject) => {
+            rp(options)
+            .then(($) => {
+                $('td.title .storylink').map(function(num) {
+                    if (((i-1) * 30) + num + 1 <= program.posts){
+                        result.articles[((i-1) * 30) + num] = {
+                            title: $(this).text(),
+                            uri: $(this).attr('href'),
+                            rank: (i-1) * 30 + num + 1
+                        };
+                    }
+                });
+                
+                resolve("Success!");
+            })
+            .catch((err) => {
+                console.log(err);
+                reject("Couldn't scrape!");
+            });
+        });
+    
+        promiseChain.push(p);
+    }
+};
+
+scrape();
+
+Promise.all(promiseChain).then(() => {
     console.log(JSON.stringify(result.articles));
-});
+})
