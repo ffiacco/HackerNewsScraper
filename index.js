@@ -47,7 +47,6 @@ let scrape = () => {
                 });
                 
                 $('td.subtext :nth-child(6)').map(function(num) {
-                    console.log($(this).text());
                     if (((i-1) * 30) + num + 1 <= program.posts){
                         result.articles[((i-1) * 30) + num].comments = $(this).text().split("&")[0];
                         result.articles[((i-1) * 30) + num].rank = (i-1) * 30 + num + 1;
@@ -68,5 +67,5 @@ let scrape = () => {
 scrape();
 
 Promise.all(promiseChain).then(() => {
-    console.log(JSON.stringify(result.articles));
+    console.log(JSON.stringify(result.articles, null, '\t'));
 })
