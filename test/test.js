@@ -42,15 +42,15 @@ describe('Scrape', function() {
             })
         });
     });
-    describe('#validAuthor()', function() {
-        it('should return the full author if less than 256 characters', function() {
+    describe('#emptyAuthor()', function() {
+        it('should return the Author Unavailable if the author is the empty string', function() {
             let promiseChain = [];
             let result = {
                 articles: []
             };
             scraper.scrape(result, promiseChain, 1, 2, $);
             return Promise.all(promiseChain).then(() => {
-                assert.deepStrictEqual(result.articles[0].author, "markcartertm");
+                assert.deepStrictEqual(result.articles[0].author, "Author Unavaiable");
             })
         });
     });
