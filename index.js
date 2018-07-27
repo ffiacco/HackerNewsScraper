@@ -9,21 +9,27 @@ program
 
 const rp = require('request-promise');
 const cheerio = require('cheerio');
+const pages = Math.ceil(program.posts/30);
 
-const options = {
-    uri: `https://news.ycombinator.com/news?p=`,
-    transform: function (body) {
-        return cheerio.load(body);
-    }
-};
+for (let i = 1; i <= pages; i++){
+    console.log("here");
+    let options = {
+        uri: `https://news.ycombinator.com/news?p=` + i,
+        transform: function (body) {
+            return cheerio.load(body);
+        }
+    };
 
-rp(options)
-  .then(($) => {
-    $('td.title .storylink').map(function(i, el) {
-        if (i < program.posts)
-            console.log(i + ": " + $(this).text());
-      });
-  })
-  .catch((err) => {
-    console.log(err);
-});
+    console.log(options.uri);
+
+    rp(options)
+    .then(($) => {
+        $('td.title .storylink').map(function(num, el) {
+            if (((i-1) * 30) + num < program.posts)
+                console.log((i-1) * 30 + num + ": " + $(this).text());
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+}
