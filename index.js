@@ -10,13 +10,7 @@ program
   .option('-p, --posts <required>','number of top posts to print', parseInt)
   .parse(process.argv);
 
-const pages = Math.ceil(program.posts/30);
-let promiseChain = [];
-let result = {
-    articles: []
-}
-
-let getTitleAndUri = ($, i) => {
+let getTitleAndUri = ($, i, result) => {
     $('td.title .storylink').map(function(num) {
         if (((i-1) * 30) + num + 1 <= program.posts){
             let title = ($(this).text() != "") ? $(this).text() : "Title Unavailable";
@@ -29,7 +23,7 @@ let getTitleAndUri = ($, i) => {
     });
 }
 
-let getAuthor = ($, i) => {
+let getAuthor = ($, i, result) => {
     $('td.subtext .hnuser').map(function(num) {
         if (((i-1) * 30) + num + 1 <= program.posts){
             let author = ($(this).text() != "") ? $(this).text() : "Author Unavaiable";
@@ -38,7 +32,7 @@ let getAuthor = ($, i) => {
     });
 }
 
-let getPoints = ($, i) => {
+let getPoints = ($, i, result) => {
     $('td.subtext .score').map(function(num) {
         let points = $(this).text().split(" ")[0];
         if (((i-1) * 30) + num + 1 <= program.posts){
@@ -47,7 +41,7 @@ let getPoints = ($, i) => {
     });
 }
 
-let getComments= ($, i) => {
+let getComments= ($, i, result) => {
     $('td.subtext :nth-child(6)').map(function(num) {
         let comments = $(this).text().split(/\s{1}/)[0];
         if (((i-1) * 30) + num + 1 <= program.posts){
@@ -56,7 +50,7 @@ let getComments= ($, i) => {
     });
 }
 
-let getRank = ($, i) => {
+let getRank = ($, i, result) => {
     $('span.rank').map(function(num) {
         let rank = $(this).text().split(".")[0];
         if (((i-1) * 30) + num + 1 <= program.posts){
@@ -65,7 +59,10 @@ let getRank = ($, i) => {
     });
 }
 
-let scrape = () => {
+var scrape = (promiseChain, pages) => {
+    let result = {
+        articles: []
+    }
     for (let i = 1; i <= pages; i++){
         let options = {
             uri: `https://news.ycombinator.com/news?p=` + i,
@@ -77,11 +74,11 @@ let scrape = () => {
         let p = new Promise((resolve, reject) => {
             rp(options)
             .then(($) => {
-                getTitleAndUri($, i);
-                getAuthor($, i);
-                getPoints($, i);
-                getComments($, i);
-                getRank($, i);
+                getTitleAndUri($, i, result);
+                getAuthor($, i, result);
+                getPoints($, i, result);
+                getComments($, i, result);
+                getRank($, i, result);
                 
                 resolve("Success!");
             })
@@ -93,15 +90,24 @@ let scrape = () => {
     
         promiseChain.push(p);
     }
+
+    return result;
 };
 
-if (0 <= program.posts && program.posts <= 100){
-    scrape();
-    Promise.all(promiseChain).then(() => {
-        console.log(JSON.stringify(result.articles, null, '\t'));
-    });
-}   
-else 
-    console.log("Invalid Input");
+let run = () => {
+    const pages = Math.ceil(program.posts/30);
+    let promiseChain = [];
+    if (0 <= program.posts && program.posts <= 100){
+        let result = scrape(promiseChain, pages);
+        Promise.all(promiseChain).then(() => {
+            console.log(JSON.stringify(result.articles, null, '\t'));
+        });
+    }   
+    else 
+        console.log("Invalid Input");
+};
+
+run();
+
 
 
