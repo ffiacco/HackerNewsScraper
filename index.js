@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-//shebang to secify node interpreter
+//shebang to specify node interpreter
 
 //require external libraries
 const program = require('commander');
