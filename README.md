@@ -5,7 +5,7 @@ A Node.js command line web scraper for HackerNews
 
 The application requires Node.js version 6.4.0 and greater. if you do not have it installed, you can do so at: https://nodejs.org/en/
 
-## Instllation
+## Installation
 
 Once you have cloned this repository, navigate to its folder. In it, run:
 
@@ -47,17 +47,17 @@ You will be moved into a bash and you can run the application with:
 
 ## External Libraries
 
-* request-promise
+* #### request-promise
 An http library that adds a .then() to Request calls leveraging Bluebird. It allows for http requests with the simplicity of Request with the added power of Promise functionality.
 
-* commander
+* #### commander
 A library to easily creat command line interfaces in Node.js. A standards in its functionality, it makes adding options extremely easy.
 
-* cheerio
+* #### cheerio
 Node.js implementation of JQuery functionality, allows easy web scraping with familiar syntax. The most widely used scraping library for Node.
 
-* validator
+* #### validator
 A library to validate a number of types of inputs, I used it to validate URIs, as it is certainly more reliable than any regex i can come up with.
 
-* mocha
+* #### mocha
 One of the most popular testing frameworks for Javascript, comes with good support for promises, which I used extensively in the application.
